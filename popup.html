@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            width: 300px;
+            padding: 15px;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #textInput {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        #sendButton {
+            padding: 8px 16px;
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #sendButton:hover {
+            background-color: #005a9e;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <textarea id="textInput" placeholder="请输入要发送的文本..."></textarea>
+        <button id="sendButton">发送</button>
+    </div>
+    <script src="popup.js"></script>
+</body>
+
+</html>

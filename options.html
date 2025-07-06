@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>扩展配置</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .config-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        input[type="checkbox"] {
+            width: auto;
+            margin-left: 5%;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background-color: #005a9e;
+        }
+
+        .status-message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1 style="margin: 0; color: #333;">扩展配置</h1>
+            <p style="color: #666; margin-top: 5px;">设置元素选择器和其他扩展选项</p>
+        </header>
+        <div class="config-group">
+            <label for="selectorInput">目标元素选择器</label>
+            <input type="text" id="selectorInput" placeholder="例如: #username 或 textarea.comment">
+            <p style="font-size: 12px; color: #666; margin-top: 5px;">请输入有效的CSS选择器，扩展将使用此选择器定位目标元素</p>
+        </div>
+        <div class="config-group">
+            <label for="selectorIframe">目标元素是否是iframe</label>
+            <input type="checkbox" id="selectorIframe" />
+            <span style="font-size: 12px; color: #666;">如果目标元素是iframe，扩展将要获取元素的 contentDocument </span>
+        </div>
+        <button id="saveConfig" style="padding: 10px 20px; font-size: 16px;">保存配置</button>
+        <div id="statusMessage" class="status-message"></div>
+        <script src="options.js"></script>
+    </div>
+</body>
+
+</html>
