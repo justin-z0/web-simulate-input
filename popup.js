@@ -11,13 +11,16 @@ document.getElementById('sendButton').addEventListener('click', async () => {
         await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: (inputText, config) => {
-                const elementSelector = config.elementSelector || '';
-                const isFrame = config.isFrame || false;
+                let elementSelector = config.elementSelector || '';
+                let isFrame = config.isFrame || false;
                 let targetElement;
                 
-                if (elementSelector) {
-                    targetElement = document.querySelector(elementSelector);
+                if (!elementSelector) {
+                    elementSelector = '#cmdline_frame > iframe';
+                    isFrame = true;
                 }
+
+                targetElement = document.querySelector(elementSelector);
                 if (isFrame) {
                     targetElement = targetElement.contentDocument;
                 }
