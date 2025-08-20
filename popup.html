@@ -44,8 +44,15 @@
 
 <body>
     <div class="container">
-        <textarea id="textInput" placeholder="请输入要发送的文本..."></textarea>
-        <button id="sendButton">发送</button>
+        <textarea id="textInput" placeholder="请输入要发送的文本&#10;如果为空，将使用配置内容"></textarea>
+        <ul id="sendList">
+            <template id="SEND_TEMPLATE">
+                <li>
+                    <label></label>
+                    <button></button>
+                </li>
+            </template>
+        </ul>
     </div>
     <script src="popup.js"></script>
 </body>

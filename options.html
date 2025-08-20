@@ -34,18 +34,29 @@
             font-weight: bold;
         }
 
-        input {
-            width: 100%;
+        li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        li span {
+            margin-right: 10px;
+            white-space: nowrap;
+            width: 80px;
+            text-align: right;
+        }
+
+        li input:not([type="checkbox"]),
+        li textarea {
+            width: 600px;
+            min-width: 600px;
+            max-width: 600px;
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 14px;
             box-sizing: border-box;
-        }
-
-        input[type="checkbox"] {
-            width: auto;
-            margin-left: 5%;
         }
 
         button {
@@ -87,17 +98,27 @@
             <h1 style="margin: 0; color: #333;">扩展配置</h1>
             <p style="color: #666; margin-top: 5px;">设置元素选择器和其他扩展选项</p>
         </header>
+
         <div class="config-group">
-            <label for="selectorInput">目标元素选择器</label>
-            <input type="text" id="selectorInput" placeholder="例如: #username 或 textarea.comment">
-            <p style="font-size: 12px; color: #666; margin-top: 5px;">请输入有效的CSS选择器，扩展将使用此选择器定位目标元素</p>
+            <label>Jira bug fix template</label>
+            <ul>
+                <li>
+                    <span>目标选择器：</span>
+                    <input type="text" name="target_selector" placeholder="请输入目标元素CSS选择器">
+                </li>
+                <li>
+                    <span>iframe 选择器：</span>
+                    <input type="text" name="iframe_selector" />
+                </li>
+                <li>
+                    <span>输入内容：</span>
+                    <textarea name="content" placeholder="请输入需要自动填入的内容"></textarea>
+                </li>
+            </ul>
         </div>
-        <div class="config-group">
-            <label for="selectorIframe">目标元素是否是iframe</label>
-            <input type="checkbox" id="selectorIframe" />
-            <span style="font-size: 12px; color: #666;">如果目标元素是iframe，扩展将要获取元素的 contentDocument </span>
-        </div>
+
         <button id="saveConfig" style="padding: 10px 20px; font-size: 16px;">保存配置</button>
+        <button id="clearConfig" style="padding: 10px 20px; font-size: 16px;">清除配置</button>
         <div id="statusMessage" class="status-message"></div>
         <script src="options.js"></script>
     </div>
