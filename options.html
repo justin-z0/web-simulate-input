@@ -99,24 +99,30 @@
             <p style="color: #666; margin-top: 5px;">设置元素选择器和其他扩展选项</p>
         </header>
 
-        <div class="config-group">
-            <label>Jira bug fix template</label>
-            <ul>
-                <li>
-                    <span>目标选择器：</span>
-                    <input type="text" name="target_selector" placeholder="请输入目标元素CSS选择器">
-                </li>
-                <li>
-                    <span>iframe 选择器：</span>
-                    <input type="text" name="iframe_selector" />
-                </li>
-                <li>
-                    <span>输入内容：</span>
-                    <textarea name="content" placeholder="请输入需要自动填入的内容"></textarea>
-                </li>
-            </ul>
+        <div class="groups">
+            <template id="GROUP_TEMPLATE">
+                <div class="config-group">
+                    <label>配置名称</label>
+                    <ul>
+                        <li>
+                            <span>目标选择器：</span>
+                            <input type="text" name="target_selector" placeholder="请输入目标元素CSS选择器">
+                        </li>
+                        <li>
+                            <span>iframe 选择器：</span>
+                            <input type="text" name="iframe_selector" />
+                        </li>
+                        <li>
+                            <span>输入内容：</span>
+                            <textarea name="content" placeholder="请输入需要自动填入的内容"></textarea>
+                        </li>
+                    </ul>
+                </div>
+            </template>
         </div>
 
+
+        <button id="newConfig" style="padding: 10px 20px; font-size: 16px;">新增配置</button>
         <button id="saveConfig" style="padding: 10px 20px; font-size: 16px;">保存配置</button>
         <button id="clearConfig" style="padding: 10px 20px; font-size: 16px;">清除配置</button>
         <div id="statusMessage" class="status-message"></div>

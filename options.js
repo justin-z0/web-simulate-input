@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    const addButton = document.getElementById('newConfig');
     const saveButton = document.getElementById('saveConfig');
     const clearButton = document.getElementById('clearConfig');
     const statusMessage = document.getElementById('statusMessage');
@@ -6,18 +7,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 加载保存的配置
     try {
         const savedConfig = await chrome.storage.local.get(['configs']) || { configs: [] };
-
-        if (savedConfig.configs.length > 0) {
-            document.querySelectorAll('.config-group').forEach((group, index) => {
-                let config = savedConfig.configs[index];
-                group.querySelector('input[name="target_selector"]').value = config.target_selector;
-                group.querySelector('input[name="iframe_selector"]').value = config.iframe_selector;
-                group.querySelector('textarea[name="content"]').value = config.content;
-            })
-        }
+        const groups = document.querySelector('.groups');
+        savedConfig.configs.forEach(config => {
+            const newGroup = document.getElementById('GROUP_TEMPLATE').content.cloneNode(true);
+            newGroup.querySelector('label').textContent = config.label;
+            newGroup.querySelector('input[name="target_selector"]').value = config.target_selector;
+            newGroup.querySelector('input[name="iframe_selector"]').value = config.iframe_selector;
+            newGroup.querySelector('textarea[name="content"]').value = config.content;
+            groups.appendChild(newGroup);
+        })
     } catch (error) {
         showMessage('加载配置失败: ' + error.message, 'error');
     }
+
+    // 新增配置
+    addButton.addEventListener('click', () => {
+        const labelName = prompt("请输入配置目标名称：");
+        if (!labelName) return;
+        const newGroup = document.getElementById('GROUP_TEMPLATE').content.cloneNode(true);
+        newGroup.querySelector('label').textContent = labelName;
+        newGroup.querySelector('input[name="target_selector"]').value = '';
+        newGroup.querySelector('input[name="iframe_selector"]').value = '';
+        newGroup.querySelector('textarea[name="content"]').value = '';
+        document.querySelector(".groups").appendChild(newGroup);
+    })
 
     // 保存配置按钮点击事件
     saveButton.addEventListener('click', async () => {
