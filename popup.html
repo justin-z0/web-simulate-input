@@ -26,7 +26,19 @@
             min-height: 80px;
         }
 
-        #sendButton {
+        /* 目标列表：不再有单独的"发送"按钮，按钮上直接显示配置名称，点击即发送。
+           保留按钮外观；用 <button> 实现是为了在元素找不到时能真正禁用（原生 disabled） */
+        #sendList {
+            list-style: none;   /* 去掉列表圆点 */
+            margin: 0;
+            padding: 0;
+        }
+
+        #sendList li + li {
+            margin-top: 6px;    /* 行与行之间留一点间距 */
+        }
+
+        #sendList button {
             padding: 8px 16px;
             background-color: #0078d7;
             color: white;
@@ -36,15 +48,28 @@
             font-size: 14px;
         }
 
-        #sendButton:hover {
+        #sendList button:hover {
             background-color: #005a9e;
         }
 
-        li.disabled *{
+        #sendList button:focus-visible {
+            outline: 2px solid #0078d7;
+            outline-offset: 2px;
+        }
+
+        /* 当前页面找不到目标元素（或页面不允许注入）时：按钮置灰、不可点击。
+           真正的"不可点击"由 JS 设置 button.disabled 保证，这里只负责视觉与鼠标兜底。
+           选择器必须带上 #sendList，否则特异性低于上面的 #sendList button，置灰色不生效 */
+        #sendList li.disabled {
+            cursor: not-allowed;
+        }
+
+        #sendList li.disabled button,
+        #sendList li.disabled button:hover {
             pointer-events: none;
-            /* background-color: red; */
-            color: red;
-            text-decoration: line-through;
+            background-color: #e0e0e0;
+            color: #9e9e9e;
+            text-decoration: none;   /* 置灰不加删除线 */
             cursor: not-allowed;
         }
 
@@ -68,9 +93,9 @@
         <textarea id="textInput" placeholder="请输入要发送的文本&#10;如果为空，将使用配置内容"></textarea>
         <div id="notice"></div>
         <ul id="sendList">
+            <!-- 一行一个目标：按钮上显示配置名称，点击即发送 -->
             <template id="SEND_TEMPLATE">
                 <li>
-                    <label></label>
                     <button></button>
                 </li>
             </template>

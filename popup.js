@@ -18,6 +18,18 @@ function isRestrictedUrl(url) {
     return RESTRICTED_HOST_RE.test(url.replace(/^https?:\/\//i, ''));
 }
 
+/**
+ * 把配置里的目标位置描述成一句人话，用于提示"为什么这个按钮点不了"
+ * @param {Object} config - 配置信息
+ * @returns {string}
+ */
+function describeTarget(config) {
+    const target = config.target_selector || '(未配置选择器)';
+    return config.iframe_selector
+        ? 'iframe「' + config.iframe_selector + '」内的「' + target + '」'
+        : '本页面的「' + target + '」';
+}
+
 (async () => {
     const sendList = document.getElementById('sendList');
     const sendTemplate = document.getElementById('SEND_TEMPLATE');
@@ -27,6 +39,26 @@ function isRestrictedUrl(url) {
     function showNotice(text) {
         notice.textContent = text;
         notice.style.display = 'block';
+    }
+
+    /**
+     * 把某个配置对应的按钮置灰并禁止点击。
+     * 注意只靠 CSS 的 pointer-events: none 是不够的——那只挡住鼠标，
+     * 按钮仍能获得焦点并被键盘（Tab 后按 Enter/Space）触发，所以这里必须
+     * 设置原生 disabled 属性。
+     * @param {DocumentFragment} sendItem - 该配置对应的列表项
+     * @param {string} reason - 置灰原因，鼠标悬停在该行上时显示
+     */
+    function markUnavailable(sendItem, reason) {
+        const li = sendItem.querySelector('li');
+        const button = sendItem.querySelector('button');
+
+        li.classList.add('disabled');
+        li.title = reason;              // 放在 li 上，disabled 的按钮不接收鼠标事件，提示出不来
+        button.title = reason;          // 按钮上也放一份，两边提示保持一致
+
+        button.disabled = true;         // 原生禁用：鼠标、键盘、焦点激活全部失效
+        button.setAttribute('aria-disabled', 'true');
     }
 
     // 加载配置：get 传入默认值对象，这样 key 不存在时也会得到 { configs: [] }。
@@ -63,13 +95,16 @@ function isRestrictedUrl(url) {
         showNotice('还没有任何配置。请在扩展的选项页中添加目标选择器和要发送的内容。');
     }
 
-    // 构造发送按钮列表
-    // 用 for...of 而不是 forEach，保证 await 按顺序执行，按钮顺序与配置顺序一致
+    // 构造发送列表：每行就是配置名称本身，点击文字即发送
+    // 用 for...of 而不是 forEach，保证 await 按顺序执行，行的顺序与配置顺序一致
     for (const config of WSI_CONFIG.configs) {
         const sendItem = sendTemplate.content.cloneNode(true);
-        sendItem.querySelector('label').textContent = config.label;
-        sendItem.querySelector('button').textContent = '发送';
-        sendItem.querySelector('button').addEventListener('click', async () => {
+        const sendButton = sendItem.querySelector('button');
+
+        sendButton.textContent = config.label;      // 按钮上直接显示配置名称
+        sendButton.title = '点击发送到：' + describeTarget(config);
+        sendButton.addEventListener('click', async () => {
+            if (sendButton.disabled) return;    // 双保险：置灰的按钮绝不发送
             let inputText = textInput.value.trim();
             inputText = inputText || config.content;    // 如果输入框为空，使用配置内容
             try {
@@ -83,9 +118,9 @@ function isRestrictedUrl(url) {
             }
         })
 
-        // 如果当前页面没有所配置的元素，则禁用发送按钮
+        // 如果当前页面没有所配置的元素，则置灰该按钮并禁止点击
         if (injectError) {
-            sendItem.querySelector("li").classList.add("disabled");
+            markUnavailable(sendItem, '当前页面不允许扩展注入脚本，无法发送');
         } else {
             try {
                 // 解构时给出兜底，避免 executeScript 返回空数组时抛出 "not iterable"
@@ -95,11 +130,11 @@ function isRestrictedUrl(url) {
                     args: [config]
                 });
                 if (!result) {
-                    sendItem.querySelector("li").classList.add("disabled");
+                    markUnavailable(sendItem, '当前页面未找到 ' + describeTarget(config));
                 }
             } catch (e) {
                 console.error("检测目标元素失败: " + e.message);
-                sendItem.querySelector("li").classList.add("disabled");
+                markUnavailable(sendItem, '无法检测 ' + describeTarget(config) + '：' + e.message);
             }
         }
 
@@ -164,10 +199,27 @@ function checkTargetExists(config) {
 
 function injectFunctions() {
     window.getTarget = function(config) {
+        if (!config || !config.target_selector) {
+            console.error("未配置目标选择器");
+            return null;
+        }
+
+        // querySelector 遇到非法选择器会抛 SyntaxError，这里统一转成"找不到"
+        function query(root, selector, what) {
+            try {
+                return root.querySelector(selector);
+            } catch (e) {
+                console.error(what + "选择器不合法: " + selector + "（" + e.message + "）");
+                return null;
+            }
+        }
+
+        let scope = document;
+
         if (config.iframe_selector) {
             // 先判空，否则选择器不匹配时会在页面里抛
             // "Cannot read properties of null (reading 'contentDocument')"
-            const iframe = document.querySelector(config.iframe_selector);
+            const iframe = query(document, config.iframe_selector, "iframe ");
             if (!iframe) {
                 console.error("未找到 iframe 元素: " + config.iframe_selector);
                 return null;
@@ -177,9 +229,9 @@ function injectFunctions() {
                 console.error("无法访问 iframe 内容（可能跨域）: " + config.iframe_selector);
                 return null;
             }
-            return iframe_doc.querySelector(config.target_selector);
+            scope = iframe_doc;
         }
 
-        return document.querySelector(config.target_selector);
+        return query(scope, config.target_selector, "目标 ");
     }
 }
