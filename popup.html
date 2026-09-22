@@ -47,12 +47,26 @@
             text-decoration: line-through;
             cursor: not-allowed;
         }
+
+        #notice {
+            display: none;
+            padding: 8px 10px;
+            border: 1px solid #ffe0b2;
+            border-radius: 4px;
+            background-color: #fff4e5;
+            color: #8a5300;
+            font-size: 12px;
+            line-height: 1.5;
+            white-space: pre-line;   /* 保留提示文案里的换行 */
+            word-break: break-all;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <textarea id="textInput" placeholder="请输入要发送的文本&#10;如果为空，将使用配置内容"></textarea>
+        <div id="notice"></div>
         <ul id="sendList">
             <template id="SEND_TEMPLATE">
                 <li>

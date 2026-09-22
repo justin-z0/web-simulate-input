@@ -6,9 +6,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 加载保存的配置
     try {
-        const savedConfig = await chrome.storage.local.get(['configs']) || { configs: [] };
+        // get 传入默认值对象，key 不存在时也会返回 { configs: [] }；
+        // 不能写 `await get(['configs']) || { configs: [] }`，因为 key 不存在时返回的是空对象 {}（truthy）
+        const savedConfig = await chrome.storage.local.get({ configs: [] });
+        const configs = Array.isArray(savedConfig.configs) ? savedConfig.configs : [];
         const groups = document.querySelector('.groups');
-        savedConfig.configs.forEach(config => {
+        configs.forEach(config => {
             const newGroup = document.getElementById('GROUP_TEMPLATE').content.cloneNode(true);
             newGroup.querySelector('label').textContent = config.label;
             newGroup.querySelector('input[name="target_selector"]').value = config.target_selector;
